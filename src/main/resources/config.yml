@@ -1,0 +1,15 @@
+difficulty: 1
+#1 - 5 (easy - hard), over 5 (brutal)
+#if the difficulty is higher than 2, zombies' attacks will have a chance of applying random
+# effects on their targets, as higher the difficulty, the duration and amplifier of the effects
+# increases as much as exponential growth
+#from the difficulty of 3, zombies will not be burn under the sunlight
+#after 15 min, the plugin's in-game difficulty will be changed automatically by this plugin
+# and repeat this every 10 minutes later.
+#when zombies interact physically with other living beings, there's a chance
+# of them doing bonus attack and giving bonus damage.
+# the extra damage is equal to the previous damage times a random number plus the difficulty to the
+# power of two devided by 100
+# formula: bonus damage = previous_damage . ( (random number(smaller than 100) + difficulty ^ 2) / 100)
+danger_tps: 13
+#interrupt the plugin's activity when the server's tps drop to or below this number

@@ -1,0 +1,8 @@
+name: ZombieApocalypse
+version: '${project.version}'
+main: io.unfish.zombieapocalypse.Main
+api-version: 1.16
+authors: [ unfish ]
+commands:
+  maps:
+    permission: za.infoshow

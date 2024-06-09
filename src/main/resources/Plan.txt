@@ -1,0 +1,16 @@
+Version 1.0:
+    Create a plugin that add to vanilla minecraft these:
+        Infected creatures that attack healthy ones: .Done
+            Have to code: + Their moving mechanism .Done
+         Modify normal zombie and the insane mobs:
+            Being able to detect player in the radius of 1km (1000 blocks)
+            Being able to unite and form stronger entities.
+            Some can break block
+            Some can explode to spread the virus
+            Some can become block to help the zombie army moves
+         Add expire date to food
+         Make wild ponds become dangerous with virus and parasites
+         Add the zombie virus:
+            After a specific length of time, turn its host into a zombie,
+            if the host is a player then simply kill them.
+            Infecting through saliva
