@@ -1,8 +1,7 @@
-package io.unfish.zombieapocalypse.util;
+package com.github.lybinhminh.zombieapocalypse.util;
 
-import io.unfish.zombieapocalypse.type.Pair;
+import com.github.lybinhminh.zombieapocalypse.type.Pair;
 import org.bukkit.Bukkit;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import java.util.ArrayList;
 import java.util.List;

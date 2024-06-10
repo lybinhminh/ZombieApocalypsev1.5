@@ -1,10 +1,10 @@
-package io.unfish.zombieapocalypse;
+package com.github.lybinhminh.zombieapocalypse;
 
 
-import io.unfish.zombieapocalypse.type.Drawers;
-import io.unfish.zombieapocalypse.type.Pair;
+import com.github.lybinhminh.zombieapocalypse.type.Drawers;
+import com.github.lybinhminh.zombieapocalypse.type.Pair;
+import com.github.lybinhminh.zombieapocalypse.util.SimpleLocation;
 
-import io.unfish.zombieapocalypse.util.SimpleLocation;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;

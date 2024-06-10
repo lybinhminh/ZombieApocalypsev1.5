@@ -1,11 +1,11 @@
-package io.unfish.zombieapocalypse;
+package com.github.lybinhminh.zombieapocalypse;
 
-import io.unfish.zombieapocalypse.entity.Host;
-import io.unfish.zombieapocalypse.entity.livingMassCollection;
-import io.unfish.zombieapocalypse.type.Drawers;
-import io.unfish.zombieapocalypse.type.Pair;
-import io.unfish.zombieapocalypse.util.Box;
-import io.unfish.zombieapocalypse.util.SimpleLocation;
+import com.github.lybinhminh.zombieapocalypse.type.Drawers;
+import com.github.lybinhminh.zombieapocalypse.type.Pair;
+import com.github.lybinhminh.zombieapocalypse.util.SimpleLocation;
+import com.github.lybinhminh.zombieapocalypse.entity.Host;
+import com.github.lybinhminh.zombieapocalypse.entity.livingMassCollection;
+import com.github.lybinhminh.zombieapocalypse.util.Box;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -19,12 +19,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -33,10 +31,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.units.qual.A;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.nio.file.*;
@@ -78,7 +74,7 @@ public final class Main extends JavaPlugin implements Listener {
     public static final List<livingMassCollection> o = new ArrayList<>();
     public static final List<Host> _abc = new ArrayList<>();
     Drawers<SimpleLocation, Integer> _abc_xyz = new Drawers<>();
-
+    Drawers<SimpleLocation, Material> _xyz = new Drawers<>();
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     @Override
     public void onEnable() {
@@ -657,29 +653,41 @@ public final class Main extends JavaPlugin implements Listener {
                         $b.setType(Material.PODZOL);
                         Lib.loadedBlocks.put(loc,$b);
                     }
-                    for(int j = 0; j < 4; ++j){
-                        int xMod = 1, zMod = 1;
+                    for(int j = 0; j < 8; ++j){
+                        int atX = 1, atZ = 0;
                         switch(j){
                             case 1:
-                                xMod = -1;
+                                atX = 0;
+                                atZ = 1;
                                 break;
                             case 2:
-                                xMod = -1;
-                                zMod = -1;
+                                atX = -1;
+                                atZ = 0;
                                 break;
                             case 3:
-                                zMod = -1;
+                                atX = 0;
+                                atZ = -1;
+                                break;
+                            case 4:
+                                atX = 1;
+                                atZ = 1;
+                                break;
+                            case 5:
+                                atX = -1;
+                                atZ = 1;
+                            break;
+                            case 6:
+                                atX = -1;
+                                atZ = -1;
+                                break;
+                            case 7:
+                                atX = 1;
+                                atZ = -1;
                         }
-                        SimpleLocation loc2 = loc.relative(xMod, 0, zMod);
+                        SimpleLocation loc2 = loc.relative(atX,0,atZ);
                         Block b2 = loc2.toBlock();
-                        if(b2.getType() != Material.PODZOL && (b2.getDestroySpeed(new ItemStack(Material.DIAMOND_PICKAXE))
-                        <= CONST0x0000) || g)
-                        {
-                            b2.setType(Material.PODZOL);
-                            Lib.loadedBlocks.put(loc2,b2);
-                            c.add(loc2);
-                            ____b.put(loc2, 120L);
-                        }
+                        if(b2.getType() != Material.PODZOL)
+                            _xyz.put(loc2, Material.PODZOL);
                     }
                     long c = ____b.get(loc) - 1;
                     if(c== 0) {
@@ -1012,8 +1020,36 @@ public final class Main extends JavaPlugin implements Listener {
                 }
             }
         }, 0, p1[0]);
+        int _a = Math.max(_xyz.size(),1) * 2/3;
         this.getServer().getPluginManager().registerEvents(this,this);
+        int schedule6 = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ()->{
+            for(int i = 0; i < _xyz.size() / Math.max(_a,1) && _xyz.size() > 0;++i){
+                final Drawers<SimpleLocation, Material> section = new Drawers<>();
+                for(int j = 0; j <  Math.max(_a,1); ++j){
+                    Pair<SimpleLocation, Material> p = _xyz.getPairByIndex(i * Math.max(_a,1) + j);
+                    if(p != null){
+                        section.putPair(p);
+                    }
+                    else
+                        break;
+                }
+                new BukkitRunnable(){
+                    int n = 0;
+                    public void run(){
+                        if(n == section.size())this.cancel();
+                        try {
+                            Block b = Objects.requireNonNull(section.getPairByIndex(n)).first.toBlock();
+                            b.setType(section.getByIndex(n));
+                            ++n;
+                        }catch(Exception e){
+                            this.cancel();
+                        }
+                    }
+                }.runTaskTimer(this, i, 1);
 
+            }
+            _xyz.clear();
+        }, 0,20);
         getLogger().info("A1");
 
     }

@@ -1,4 +1,6 @@
-package io.unfish.zombieapocalypse.type;
+package com.github.lybinhminh.zombieapocalypse.type;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 
 public class Drawers <T1,T2>{
@@ -74,5 +76,26 @@ public class Drawers <T1,T2>{
             remove(k);
             put(newKey, v);
         }
+    }
+    public T2 getByIndex(int i){
+        return map.get(i);
+    }
+    public int getIndexOfKey(T1 k){
+        return list.indexOf(k);
+    }
+    public int getIndexOfValue(T2 v, int start){
+        int rPos;
+        for(rPos = 0; rPos< list.size(); ++rPos){
+            T2 e = map.get(rPos);
+            if(e.equals(v) && rPos >= start)return rPos;
+        }
+        return -1;
+    }
+    public @Nullable Pair<T1,T2> getPairByIndex(int i){
+        if(i >= list.size()) return null;
+                return new Pair<>(list.get(i), map.get(i));
+    }
+    public void putPair(Pair<T1,T2> p){
+        put(p.first, p.second);
     }
 }

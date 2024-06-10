@@ -1,6 +1,6 @@
-package io.unfish.zombieapocalypse.util;
+package com.github.lybinhminh.zombieapocalypse.util;
 
-import io.unfish.zombieapocalypse.Lib;
+import com.github.lybinhminh.zombieapocalypse.Lib;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;

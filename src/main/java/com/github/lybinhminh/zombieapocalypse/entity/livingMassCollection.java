@@ -1,11 +1,10 @@
-package io.unfish.zombieapocalypse.entity;
+package com.github.lybinhminh.zombieapocalypse.entity;
 
-import io.unfish.zombieapocalypse.Lib;
-import io.unfish.zombieapocalypse.Main;
-import io.unfish.zombieapocalypse.type.Drawers;
-import io.unfish.zombieapocalypse.type.Pair;
-import io.unfish.zombieapocalypse.util.Box;
-import io.unfish.zombieapocalypse.util.SimpleLocation;
+import com.github.lybinhminh.zombieapocalypse.Lib;
+import com.github.lybinhminh.zombieapocalypse.Main;
+import com.github.lybinhminh.zombieapocalypse.type.Pair;
+import com.github.lybinhminh.zombieapocalypse.util.SimpleLocation;
+import com.github.lybinhminh.zombieapocalypse.util.Box;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 

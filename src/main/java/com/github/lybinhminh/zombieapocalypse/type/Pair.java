@@ -1,4 +1,4 @@
-package io.unfish.zombieapocalypse.type;
+package com.github.lybinhminh.zombieapocalypse.type;
 
 public class Pair <T1, T2> extends Object{
     public T1 first;
@@ -19,4 +19,5 @@ public class Pair <T1, T2> extends Object{
     public T2 getValue(){
         return second;
     }
+
 }
