@@ -20,6 +20,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
@@ -762,22 +763,26 @@ public final class Main extends JavaPlugin implements Listener {
                                              if (distance <= Math.sqrt(3 * Math.pow(2 * $b.state, 2))) {
                                                  livingEntity.damage($b.state * 5 + DIFFICULTY * 15);
                                                  $b.health += 5 * $b.state;
-                                                 livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 21, 1));
-                                                 livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 21, 1));
-                                                 livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 21, 1));
-                                                 livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 21, 1));
-                                                 livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, 1));
+                                                 if(livingEntity instanceof Player) {
+                                                     livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 21, 1));
+                                                     livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 21, 1));
+                                                     livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 21, 1));
+                                                     livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 21, 1));
+                                                     livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 21, 1));
+                                                 }
+
+                                             } else {
                                                  if (livingEntity instanceof Player) {
                                                      try {
                                                          Player p = (Player) livingEntity;
                                                          String ip = Objects.requireNonNull(p.getAddress()).getAddress().getHostAddress();
                                                          if(!reverseMovingOnPlayers.contains(ip))
-                                                         reverseMovingOnPlayers.add(ip);
+                                                             reverseMovingOnPlayers.add(ip);
                                                      } catch (Exception ex2) {
                                                          ex2.printStackTrace();
+                                                         this.cancel();
                                                      }
                                                  }
-                                             } else {
                                                  try {
                                                      if (way.size() == 0 || count2[0] >= 7) {
                                                          if(way.size() > 0)way.clear();
@@ -1462,7 +1467,8 @@ public final class Main extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
     }
-                           @Override
+
+    @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, String label, String[] args){
         if(label.equalsIgnoreCase("maps")){
             if(sender.hasPermission("za.infoshow") || sender.isOp()){
@@ -1478,5 +1484,4 @@ public final class Main extends JavaPlugin implements Listener {
         }
          return super.onCommand(sender, cmd, label, args);
     }
-
 }
