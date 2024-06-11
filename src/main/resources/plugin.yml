@@ -1,6 +1,6 @@
 name: ZombieApocalypse
 version: '${project.version}'
-main: io.unfish.zombieapocalypse.Main
+main: com.github.lybinhminh.zombieapocalypse.Main
 api-version: 1.16
 authors: [ unfish ]
 commands:
