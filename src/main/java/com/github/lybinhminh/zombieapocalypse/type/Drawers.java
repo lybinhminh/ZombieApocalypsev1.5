@@ -14,7 +14,6 @@ public class Drawers <T1,T2>{
 
         if(list.contains(k)){
             int a = list.indexOf(k);
-            list.remove(a);
             map.remove(a);
             map.add(a, v);
         }
