@@ -4,18 +4,24 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class Drawers <T1,T2>{
+    /**
+     * Similar to HashMap but get element by comparing the keys' value to
+     *  the request key instead of memory address
+     */
     List<T1> list = new ArrayList<>();
-    Map<Integer, T2> map = new HashMap<>();
+    List<T2> map = new ArrayList<>();
     public void put(T1 k , T2 v){
         int a;
         if(list.contains(k)){
             a = list.indexOf(k);
+            map.remove(a);
+            map.add(a, v);
         }
         else{
             a = list.size();
             list.add(k);
+            map.add(v);
         }
-        map.put(a, v);
     }
     public T2 get(T1 k){
         if(list.contains(k)){
@@ -33,7 +39,7 @@ public class Drawers <T1,T2>{
         return list.contains(k);
     }
     public boolean containsValue(T2 v){
-        return map.containsValue(v);
+        return map.contains(v);
     }
     @SafeVarargs
     public final void remove(T1... keys){
@@ -42,11 +48,7 @@ public class Drawers <T1,T2>{
             if(a != -1)
             {
                 map.remove(a);
-
                 list.remove(a);
-                for (int i = 0; i < map.size() - (1 + a); ++i) {
-                    map.put(a + i, map.get(a + i + 1));
-                }
             }
         }
     }
@@ -97,5 +99,11 @@ public class Drawers <T1,T2>{
     }
     public void putPair(Pair<T1,T2> p){
         put(p.first, p.second);
+    }
+    public List<T1> copyOfKeys(){
+        return new ArrayList<T1>(list);
+    }
+    public List<T2> copyOfValues(){
+        return new ArrayList<T2>( map);
     }
 }

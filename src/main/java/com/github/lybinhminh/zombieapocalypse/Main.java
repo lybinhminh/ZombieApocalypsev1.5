@@ -43,9 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Main extends JavaPlugin implements Listener {
     final List<UUID> a =  new ArrayList<>(); // list of minecraft vanilla zombie
     final  List<Host> b = new ArrayList<>(); // list of plugin's infected creatures
-
     public static final List<SimpleLocation> c = new ArrayList<>(); // list of graves' locations.
-
     final Map<UUID,  Long> d = new ConcurrentHashMap<>(); // list of sane period of the bitten-by-zombies creatures
     public static final double CONST0x0000 = 2.0d;
     final int CONST0x0001 = 200,CONST0x0002= 10, CONST0x0003 = 1000,    CONST0x0004 = 5;
@@ -74,8 +72,11 @@ public final class Main extends JavaPlugin implements Listener {
     Map<String, UUID> ipToPlayer = new HashMap<>();
     public static final List<livingMassCollection> o = new ArrayList<>();
     public static final List<Host> _abc = new ArrayList<>();
+    public final Drawers<SimpleLocation, Material> _xyz = new Drawers<>();
     Drawers<SimpleLocation, Integer> _abc_xyz = new Drawers<>();
-    Drawers<SimpleLocation, Material> _xyz = new Drawers<>();
+    public final static int[] noThreads = {0};
+    public static boolean debugMode = false;
+    public final List<Chunk> _def = new ArrayList<>();
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     @Override
     public void onEnable() {
@@ -414,7 +415,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             }
         }
-        }, 0 , CONST0x0004 * 20);
+        }, 0 , 100);
 
         int schedule2 = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ()-> {
             {
@@ -422,7 +423,11 @@ public final class Main extends JavaPlugin implements Listener {
                     UUID uid = a.get(i);
                     try {
                         Zombie zombie = (Zombie) Objects.requireNonNull(Bukkit.getEntity(uid));
-                        if(zombie.getTarget() != null){
+                        SimpleLocation zomLoc = new SimpleLocation(zombie.getLocation());
+                        if(zombie.getTarget() != null ){
+                            LivingEntity target = zombie.getTarget();
+                            SimpleLocation tarLoc = new SimpleLocation(target.getLocation());
+                            if(zomLoc.distance(tarLoc) > 50 * Math.sqrt(22))continue;
                             List<Block> bs = zombie.getLineOfSight(null, 2);
                             for(Block b : bs) {
                                 List<SimpleLocation>loc = new ArrayList<>();
@@ -469,7 +474,7 @@ public final class Main extends JavaPlugin implements Listener {
                 for(Map.Entry<UUID, Long> b : $a){
                     LivingEntity c = (LivingEntity)Bukkit.getEntity(b.getKey());
                     if(c == null){
-                        d.remove(null);
+                        d.remove(b.getKey());
                         continue;
                     }
                     else if(c.isDead()){
@@ -545,13 +550,7 @@ public final class Main extends JavaPlugin implements Listener {
                         World world = livingEntity.getWorld();
                         for(int y = 255; y > livingEntity.getLocation().getBlockY() - 1 + Math.round(livingEntity.getHeight()); --y){
                             SimpleLocation loc = new SimpleLocation(world.getUID(),x,y,z);
-                            Block b;
-                            if(__a.containsKey(loc) && __a.get(loc) != null)
-                                b = __a.get(loc);
-                            else {
-                                b = world.getBlockAt(x, y, z);
-                                __a.put(loc, b);
-                            }
+                            Block b = loc.toBlock();
                             if(b.getType().isOccluding()){
                               isInShadow = true;
                                 break;
@@ -564,136 +563,91 @@ public final class Main extends JavaPlugin implements Listener {
                             livingEntity.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION,200,1));
                         }
                 }
-                    else{
+                    else if(livingEntity == null){
                         g.remove(i--);
                     }
         }
-                statistics.put("Vanilla zombie quantity" , String.valueOf(a.size()));
-                statistics.put("Plugin modified zombie quantity", String.valueOf(b.size()));
-                StringBuilder intermediate = new StringBuilder();
-                for(Map.Entry<UUID, Long> e : d.entrySet()){
-                    LivingEntity livingEntity = (LivingEntity)Bukkit.getEntity(e.getKey());
-                    if(livingEntity == null){
-                        d.remove(e.getKey());
-                        continue;
-                    }
-                    intermediate.append(livingEntity.getName()).append(":").append(livingEntity.getUniqueId()).append(" -> ").append(e.getValue())
-                    .append("\n");
-                }
-                statistics.put("Victims and their left time of being conscious", intermediate.toString());
-                intermediate = new StringBuilder();
-            for(int i = 0; i < c.size(); ++i){
-                SimpleLocation loc = c.get(i);
-                intermediate.append(loc.x).append(", ").append(loc.y).append(", ").append(loc.z).append("\n");
-            }
-                statistics.put("Graves", intermediate.toString());
-                statistics.put("Difficulty", Integer.toString(DIFFICULTY));
 
+                StringBuilder intermediate;
             {
-                List<Component> pages = new ArrayList<>();
-                for(Map.Entry<String, String> e : statistics.entrySet()){
-                    List<String> dataLines = new ArrayList<>(Arrays.asList(e.getValue().split("\n")));
-                    if(dataLines.size() == 1)
-                        pages.add(Component.text(e.getKey()).append(Component.text(" : ")).append(Component.text(e.getValue())));
-                    else {
-                        intermediate = new StringBuilder();
-                        intermediate.append( e.getKey()).append( ":");
-                        for (int i = 0; i < dataLines.size() / 5 + 1; ++i) {
-                            for (int j = 0; j < 5 && j < dataLines.size(); ++j) {
-                                intermediate.append(dataLines.get(0)).append("\n");
-                                dataLines.remove(0);
-                            }
-                            pages.add(Component.text(intermediate.toString()));
-                            intermediate = new StringBuilder();
-                        }
+                if (getServer().getOnlinePlayers().size() > 0)
+                 {
+                final List<SimpleLocation > copy = new ArrayList<>(c);
 
+                for (int i = 0 ;i < copy.size(); ++ i) {
+                    SimpleLocation loc = copy.get(i);
 
-                    }
-                }
-                if(terminal == null)
-                terminal = Book.book(Component.text("terminal" ), Component.text("Ly Binh Minh"),
-                        pages);
-                else
-                   terminal =  terminal.pages(pages);
-
-            }
-            {
-                final List<SimpleLocation> copy = new ArrayList<>(c);
-                for(int i = 0; i < copy.size(); ++i) {
-                    if(getServer().getOnlinePlayers().size() == 0)break;
-
-                    SimpleLocation loc = c.get(i);
                     boolean inLoadingArea = false;
-                    for(Player p : getServer().getOnlinePlayers()){
+                    for (Player p : getServer().getOnlinePlayers()) {
                         SimpleLocation pLoc = new SimpleLocation(p.getLocation());
                         double distance = pLoc.distance(loc);
-                        if(distance < 1428.29d){
+                        if (distance < 1428.29d) {
                             inLoadingArea = true;
                             break;
                         }
                     }
-                    if(!inLoadingArea)continue;
+                    if (!inLoadingArea) continue;
 
                     livingMassCollection[] f = new livingMassCollection[1];
                     boolean g = o.stream().anyMatch(s -> (f[0] = s).region.centre.distance(loc) < 367.42
-                    && s.health > 0d);
-                    try{
-                    if (!g && DIFFICULTY >= 5 && Objects.requireNonNull(Bukkit.getWorld(loc.world)).getFullTime()
-                    > 4800000L && randomMachine.nextInt(10000) == 1) {
-                        SimpleLocation loc1 = loc.relative(1, 0, 1),
-                                loc2 = loc.relative(-1, 3, -1);
-                        f[0] = new livingMassCollection(new Box(loc1, loc2));
-                        o.add(f[0]);
-                        g = true;
-                    }
-                }catch(Exception exc){
+                            && s.health > 0d);
+                    try {
+                        if (!g && DIFFICULTY >= 5 && Objects.requireNonNull(Bukkit.getWorld(loc.world)).getFullTime()
+                                > 4800000L && randomMachine.nextInt(10000) == 1) {
+                            SimpleLocation loc1 = loc.relative(1, 0, 1),
+                                    loc2 = loc.relative(-1, 3, -1);
+                            f[0] = new livingMassCollection(new Box(loc1, loc2));
+                            o.add(f[0]);
+                            g = true;
+                        }
+                    } catch (Exception exc) {
                         exc.printStackTrace();
                     }
                     Block $b = loc.toBlock();
-                    if($b.getType() != Material.PODZOL){
-                        $b.setType(Material.PODZOL);
-                        Lib.loadedBlocks.put(loc,$b);
+                    if ($b.getType() != Material.PODZOL) {
+                        c.remove(i);
+                        continue;
                     }
                     for(int j = 0; j < 8; ++j){
-                        int atX = 1, atZ = 0;
+                        int xMod = 1, zMod = 0;
                         switch(j){
                             case 1:
-                                atX = 0;
-                                atZ = 1;
+                                zMod = 1;
                                 break;
                             case 2:
-                                atX = -1;
-                                atZ = 0;
+                                xMod = -1;
                                 break;
                             case 3:
-                                atX = 0;
-                                atZ = -1;
+                                xMod = -1;
+                                zMod = -1;
                                 break;
                             case 4:
-                                atX = 1;
-                                atZ = 1;
+                                zMod = -1;
                                 break;
                             case 5:
-                                atX = -1;
-                                atZ = 1;
-                            break;
+                                xMod = 0;
+                                zMod = 1;
+                                break;
                             case 6:
-                                atX = -1;
-                                atZ = -1;
+                                xMod = -1;
                                 break;
                             case 7:
-                                atX = 1;
-                                atZ = -1;
+                                xMod = 0;
+                                zMod = -1;
                         }
-                        SimpleLocation loc2 = loc.relative(atX,0,atZ);
-                        Block b2 = loc2.toBlock();
-                        if(b2.getType() != Material.PODZOL)
-                            _xyz.put(loc2, Material.PODZOL);
+                        for(int y = (int)Math.round( loc.y - 1); y <= loc.y + 1; ++y) {
+                            SimpleLocation loc2 = loc.relative(xMod, y, zMod);
+                            Block b2 = loc2.toBlock();
+                            if(randomMachine.nextBoolean() && b2.isSolid()){
+                                _xyz.put(loc2, Material.COARSE_DIRT);
+                            }
+                        }
                     }
                     long c = ____b.get(loc) - 1;
-                    if(c== 0) {
+                    if (c == 0) {
                         ____b.put(loc, 120L);
-                            try {
+                        try {
+                            if (a.size() + b.size() <= zombieLimit && !loc.relative(0, 1, 0).toBlock().isSolid())
                                 if (randomMachine.nextBoolean()) {
                                     int n = 0, o = randomMachine.nextInt(10) + 1;
                                     do {
@@ -701,41 +655,42 @@ public final class Main extends JavaPlugin implements Listener {
                                                 EntityType.ZOMBIE);
                                         a.add(zombie.getUniqueId());
                                         n++;
-                                    }while(g && b.size() + a.size() <= zombieLimit
-                                        && n < o);
+                                    } while (g && b.size() + a.size() <= zombieLimit
+                                            && n < o);
                                 } else {
                                     int n = 0, o = randomMachine.nextInt(5) + 1;
                                     do {
-                                    EntityType[] basic_types = {EntityType.COW, EntityType.CHICKEN, EntityType.SHEEP, EntityType.PIG};
-                                    LivingEntity d = (LivingEntity) Objects.requireNonNull(Bukkit.getWorld(loc.world)).spawnEntity(loc.relative(0, 1, 0).toLocation(),
-                                            basic_types[randomMachine.nextInt(4)]);
-                                    Host h = new Host(d);
-                                    b.add(h);
-                                    n++;
-                                    }while(g && b.size() + a.size() <= zombieLimit
+                                        EntityType[] basic_types = {EntityType.COW, EntityType.CHICKEN, EntityType.SHEEP, EntityType.PIG};
+                                        LivingEntity d = (LivingEntity) Objects.requireNonNull(Bukkit.getWorld(loc.world)).spawnEntity(loc.relative(0, 1, 0).toLocation(),
+                                                basic_types[randomMachine.nextInt(4)]);
+                                        Host h = new Host(d);
+                                        b.add(h);
+                                        n++;
+                                    } while (g && b.size() + a.size() <= zombieLimit
                                             && n < o);
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-
-                        try {
-                            for (int y = 0; y < Objects.requireNonNull(Bukkit.getWorld(loc.world)).getMaxHeight(); ++y) {
-                                SimpleLocation loc3 = loc.relative(0, 1, 0);
-                                Block b3 = loc3.toBlock();
-                            }
-                        }catch(Exception ex){
-                            ex.printStackTrace();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
 
-                    }
-                    else{
+                    } else {
                         ____b.put(loc, c - 1);
                     }
                 }
             }
+            }
             {
                 for(livingMassCollection $b : o){
+                    boolean loaded = false;
+                    for(Player p : getServer().getOnlinePlayers()){
+                        if(p.getWorld().getUID().compareTo($b.region.centre.world) == 0){
+                            if(new SimpleLocation(p.getLocation()).distance($b.region.centre) < 1428.29d){
+                                loaded = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(!loaded)continue;
                     Location loc = $b.region.centre.toLocation();
                     for(Entity e : loc.getNearbyEntities( $b.region.longSide  + $b.state * 8, $b.region.bottom.y * 2,
                              $b.region.longSide  + $b.state * 8)){
@@ -865,17 +820,34 @@ public final class Main extends JavaPlugin implements Listener {
                     }
                 }
             }
-            {
-                intermediate = new StringBuilder();
-                for(Map.Entry<String,UUID> e : ipToPlayer.entrySet()){
-                    try {
-                        intermediate.append(e.getKey()).append(" -> ").append(Objects.requireNonNull(Bukkit.getPlayer(e.getValue())).getName())
-                        .append("\n");
-                    }catch(Exception ex2){
-                        ex2.printStackTrace();
+            if(getServer().getOnlinePlayers().size() > 0 && _xyz.size() > 0){
+                int i = 0;
+                Pair<SimpleLocation, Material> p;
+                boolean inLoadedArea = false;
+                do {
+
+                    p = _xyz.getPairByIndex(i++);
+                    for (Player plr : getServer().getOnlinePlayers()) {
+                        SimpleLocation pLoc = new SimpleLocation(plr.getLocation());
+                        assert p != null;
+                        if (pLoc.distance(p.first) < 1428.29d) {
+                            inLoadedArea = true;
+                            break;
+                        }
                     }
+                }while(inLoadedArea && i < _xyz.size());
+                if(inLoadedArea) {
+                    assert p != null;
+                    _xyz.remove(p.first);
+                    Block b = p.first.toBlock();
+                    b.setType(p.second);
                 }
-                statistics.put("Ip to players:", intermediate.toString());
+            }
+            {
+                for(Chunk c: _def){
+                    c.unload();
+                }
+                _def.clear();
             }
         }, 0, 20);
 
@@ -989,7 +961,7 @@ public final class Main extends JavaPlugin implements Listener {
 
                 },
                 18000, 12000);
-        final int p1[] = {600};
+        final int[] p1 = {600};
         int schedule5 = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
             for(int i = 0; i < a.size();++i){
                 try {
@@ -1025,36 +997,100 @@ public final class Main extends JavaPlugin implements Listener {
                 }
             }
         }, 0, p1[0]);
-        int _a = Math.max(_xyz.size(),1) * 2/3;
-        this.getServer().getPluginManager().registerEvents(this,this);
-        int schedule6 = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ()->{
-            for(int i = 0; i < _xyz.size() / Math.max(_a,1) && _xyz.size() > 0;++i){
-                final Drawers<SimpleLocation, Material> section = new Drawers<>();
-                for(int j = 0; j <  Math.max(_a,1); ++j){
-                    Pair<SimpleLocation, Material> p = _xyz.getPairByIndex(i * Math.max(_a,1) + j);
-                    if(p != null){
-                        section.putPair(p);
+        int schedule6 = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this,()->{
+            {
+                StringBuilder intermediate = new StringBuilder();
+                for(Pair<SimpleLocation, Double> c : SimpleLocation.recentlyLoadedChunks.entrySet()){
+                    try {
+                        intermediate.append(c.first.toString()).append(" -> ").append(c.second).append("\n");
+                    }catch(Exception e){
+                        getLogger().info(" " + c.first + " " + c.second);
                     }
-                    else
-                        break;
                 }
-                new BukkitRunnable(){
-                    int n = 0;
-                    public void run(){
-                        if(n == section.size())this.cancel();
-                        try {
-                            Block b = Objects.requireNonNull(section.getPairByIndex(n)).first.toBlock();
-                            b.setType(section.getByIndex(n));
-                            ++n;
-                        }catch(Exception e){
-                            this.cancel();
+                statistics.put("Chunk unload wait:",intermediate.toString());
+            }
+            {
+              StringBuilder intermediate = new StringBuilder();
+                for(Map.Entry<String,UUID> e : ipToPlayer.entrySet()){
+                    try {
+                        intermediate.append(e.getKey()).append(" -> ").append(Objects.requireNonNull(Bukkit.getPlayer(e.getValue())).getName())
+                                .append("\n");
+                    }catch(Exception ex2){
+                        ex2.printStackTrace();
+                    }
+                }
+                statistics.put("Ip to players:", intermediate.toString());
+            }
+            {
+                statistics.put("Vanilla zombie quantity", String.valueOf(a.size()));
+                statistics.put("Plugin modified zombie quantity", String.valueOf(b.size()));
+                StringBuilder intermediate = new StringBuilder();
+                for (Map.Entry<UUID, Long> e : d.entrySet()) {
+                    LivingEntity livingEntity = (LivingEntity) Bukkit.getEntity(e.getKey());
+                    if (livingEntity == null) {
+                        d.remove(e.getKey());
+                        continue;
+                    }
+                    intermediate.append(livingEntity.getName()).append(":").append(livingEntity.getUniqueId()).append(" -> ").append(e.getValue())
+                            .append("\n");
+                }
+                statistics.put("Victims and their left time of being conscious", intermediate.toString());
+                intermediate = new StringBuilder();
+                for (int i = 0; i < c.size(); ++i) {
+                    SimpleLocation loc = c.get(i);
+                    intermediate.append(loc.x).append(", ").append(loc.y).append(", ").append(loc.z).append("\n");
+                }
+                statistics.put("Graves", intermediate.toString());
+                statistics.put("Difficulty", Integer.toString(DIFFICULTY));
+
+                {
+                    List<Component> pages = new ArrayList<>();
+                    for (Map.Entry<String, String> e : statistics.entrySet()) {
+                        List<String> dataLines = new ArrayList<>(Arrays.asList(e.getValue().split("\n")));
+                        if (dataLines.size() == 1)
+                            pages.add(Component.text(e.getKey()).append(Component.text(" : ")).append(Component.text(e.getValue())));
+                        else {
+                            intermediate = new StringBuilder();
+                            intermediate.append(e.getKey()).append(":");
+                            for (int i = 0; i < dataLines.size() / 5 + 1; ++i) {
+                                for (int j = 0; j < 5 && j < dataLines.size(); ++j) {
+                                    intermediate.append(dataLines.get(0)).append("\n");
+                                    dataLines.remove(0);
+                                }
+                                pages.add(Component.text(intermediate.toString()));
+                                intermediate = new StringBuilder();
+                            }
+
+
                         }
                     }
-                }.runTaskTimer(this, i, 1);
+                    if (terminal == null)
+                        terminal = Book.book(Component.text("terminal"), Component.text("Ly Binh Minh"),
+                                pages);
+                    else
+                        terminal = terminal.pages(pages);
+                }
 
             }
-            _xyz.clear();
-        }, 0,20);
+            for(Pair<SimpleLocation, Double> c : SimpleLocation.recentlyLoadedChunks.entrySet()){
+                double loadPeriod = Math.max(0,c.second - 1d);
+                if(loadPeriod == 0){
+                    try{
+                        Chunk chunk = Objects.requireNonNull(Bukkit.getWorld(c.first.world)).getChunkAt((int)Math.round(c.first.x),
+                                (int)Math.round(c.first.z));
+                        _def.add(chunk);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                    SimpleLocation.recentlyLoadedChunks.remove(c.first);
+                }
+                else
+                SimpleLocation.recentlyLoadedChunks.put(c.first, loadPeriod);
+            }
+        }, 0, 20);
+        this.getServer().getPluginManager().registerEvents(this,this);
+
+
         getLogger().info("A1");
 
     }
@@ -1066,7 +1102,11 @@ public final class Main extends JavaPlugin implements Listener {
         //type:Location(x:y:z):others
         try {
             int n = 1;
-            File f = new File("./plugins/"+ this.getName()+"/data" + n++  + ".save");
+            File folder = new File("./plugins/ZombieApocalypse");
+            if(!folder.exists()){
+                folder.mkdir();
+            }
+            File f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
             f.createNewFile();
             PrintWriter pw = new PrintWriter(f);
             String type;
@@ -1325,15 +1365,10 @@ public final class Main extends JavaPlugin implements Listener {
             }
         }
         SimpleLocation loc = new SimpleLocation(b.getLocation());
-        if(Lib.saved_reachableFromLoc.containsKey(loc)){
-            Lib.saved_reachableFromLoc.remove(loc);
-        }
         if(Lib.loadedBlocks.containsKey(loc)){
             Lib.loadedBlocks.remove(loc);
         }
-        if(Lib.saved_reachableFromLoc_public.containsKey(loc)){
-            Lib.saved_reachableFromLoc_public.remove(loc);
-       }
+
         if(_abc_xyz.containsKey(loc)){
             _abc_xyz.remove(loc);
         }
@@ -1349,15 +1384,11 @@ public final class Main extends JavaPlugin implements Listener {
     public void blockInteract(BlockPlaceEvent event){
         Block b = event.getBlock();
         SimpleLocation loc = new SimpleLocation(b.getLocation());
-        if(Lib.saved_reachableFromLoc.containsKey(loc)){
-            Lib.saved_reachableFromLoc.remove(loc);
-        }
+
         if(Lib.loadedBlocks.containsKey(loc)){
             Lib.loadedBlocks.remove(loc);
         }
-        if(Lib.saved_reachableFromLoc_public.containsKey(loc)){
-            Lib.saved_reachableFromLoc_public.remove(loc);
-        }
+
     }
     @SuppressWarnings("deprecation")
     @EventHandler
@@ -1480,6 +1511,139 @@ public final class Main extends JavaPlugin implements Listener {
                     sender.sendMessage("Sorry, but this command is only executable by a player.\n");
                 }
 
+            }
+        }
+        if(label.equals("debug")){
+            if(sender.hasPermission("za.plugin")){
+              debugMode = !debugMode;
+              getLogger().info("Debug mode is now :" + Boolean.toString(debugMode).toUpperCase());
+            }
+        }
+        if(label.equalsIgnoreCase("infect")){
+            if(sender.hasPermission("za.game")){
+                if(args.length == 0 && sender instanceof Player)
+                {
+                    Player p = (Player)sender;
+                    Entity e = p.getTargetEntity(10, true);
+                    if(e != null)
+                    if(e.getType().isAlive() && !e.isDead()){
+                        if(e instanceof Zombie){
+                            p.sendMessage("Zombies cannot be infected again!");
+                        }
+                        else {
+                            Host h = new Host((LivingEntity)e.getWorld().spawnEntity(e.getLocation(),e.getType()));
+                            b.add(h);
+                            e.remove();
+                            p.sendMessage("Infected the target mob");
+                        }
+                    }
+                    else{
+                        p.sendMessage("The target entity is not insentient!");
+                    }
+                    else{
+                        p.sendMessage("There must be an entity in front of you!");
+                    }
+                }
+                else if(args.length >= 2 && args[0].equalsIgnoreCase("entity_core")){
+                   int state = 0;
+                        try{
+                            state = Integer.parseInt(args[1]);
+                        }catch(Exception e){
+                            sender.sendMessage("Wrong format for the second argument, set the state to the default value of 0");
+                        }
+
+                    SimpleLocation loc = null;
+                        if(args.length == 6){
+                            World w = Bukkit.getWorld(args[2]);
+                            if(w == null){
+                                sender.sendMessage("Unknown world. Valid options: ");
+                                getServer().getWorlds().forEach(s->sender.sendMessage(s.getName()));
+                            }
+                            else{
+                                try{
+                                    double x = Double.parseDouble(args[3]),
+                                            y = Double.parseDouble(args[4]),
+                                            z = Double.parseDouble(args[5]);
+                                    w.loadChunk((int)(x / 16), (int)(z / 16));
+                                    loc = new SimpleLocation(w.getUID(), x,y,z);
+                                }catch(Exception e){
+                                    sender.sendMessage("Wrong format for arguments 4, 5, 6, use a random location!");
+                                }
+                            }
+                        }
+                        if(loc == null){
+                            World w =getServer().getWorlds().get(randomMachine.nextInt(getServer().getWorlds().size()));
+                            double x = randomMachine.nextDouble() % getServer().getMaxWorldSize(), z
+                                    = randomMachine.nextDouble() % getServer().getMaxWorldSize(),
+                                    y;
+                            w.loadChunk((int)Math.round(x),(int)Math.round(z));
+                            for(y = 255; y > 0; --y){
+                                SimpleLocation loc2 = new SimpleLocation(w.getUID(),x,y,z);
+                                Block b = loc2.toBlock();
+                                if(b.isSolid()){
+                                    y--;
+                                    break;
+                                }
+                            }
+                            loc = new SimpleLocation(w.getUID(),x,y,z);
+
+                        }
+                    livingMassCollection entity_core = new livingMassCollection(new Box(loc.relative(1,0,1),
+                            loc.relative(-1,0,-1)));
+                    while(entity_core.state  <= state){
+                        entity_core.grow();
+                    }
+                    o.add(entity_core);
+                    entity_core.region.centre.toLocation().getWorld().unloadChunk((int)(loc.x / 16),
+                            (int)(loc.z / 16));
+
+                    sender.sendMessage("summon a entity_core at " + entity_core.region.centre.toString() + " at state " + args[2]);
+                }
+                else if(args.length < 4){
+                    sender.sendMessage("Too few arguments: at least 4 is needed! <world_name> <x> <y> <z>");
+                }
+                else{
+                    if(args.length == 4){
+                        World w = Bukkit.getWorld(args[0]);
+                        if(w == null){
+                            sender.sendMessage("Unknown world. Valid options: ");
+                            getServer().getWorlds().forEach(s->sender.sendMessage(s.getName()));
+                        }
+                        else {
+                            Zombie zom = (Zombie)w.spawnEntity(new Location(w, Double.parseDouble(args[1]),
+                                    Double.parseDouble(args[2]),
+                                    Double.parseDouble(args[3])), EntityType.ZOMBIE);
+                            a.add(zom.getUniqueId());
+                            sender.sendMessage("Summoned a new zombie at " + zom.getLocation().toString());
+                        }
+                    }
+                    if(args.length == 5){
+                        World w = Bukkit.getWorld(args[0]);
+                        if(w == null){
+                            sender.sendMessage("Unknown world. Valid options: ");
+                            getServer().getWorlds().forEach(s->sender.sendMessage(s.getName()));
+                        }
+                        else {
+                            EntityType t = null;
+                            try {
+                               t = EntityType.valueOf(args[4]);
+                                Host h = new Host((LivingEntity)w.spawnEntity(new Location(w, Double.parseDouble(args[1]),
+                                        Double.parseDouble(args[2]),
+                                        Double.parseDouble(args[3])), t));
+                                b.add(h);
+                                sender.sendMessage("Summoned a new infected entity at " + h.baseEntity.getLocation().toString());
+                            }
+                            catch(Exception e){
+                                sender.sendMessage("Unknown entity type for api version " + PLUGIN.getDescription().getAPIVersion() + ". Valid options:");
+                                Arrays.stream(EntityType.values()).forEach(s->sender.sendMessage(s.name()));
+                            }
+
+                        }
+                    }
+                }
+            }
+            else{
+                sender.sendMessage("you don\'t have the required permission: za.game!");
             }
         }
          return super.onCommand(sender, cmd, label, args);

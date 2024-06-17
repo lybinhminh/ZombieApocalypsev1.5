@@ -22,8 +22,6 @@ import java.util.*;
 public class Lib {
     public static final ItemStack cure_apple = new ItemStack(Material.GOLDEN_APPLE);
     public static final Drawers<SimpleLocation, Block> loadedBlocks = new Drawers<>();
-    public static final Drawers<SimpleLocation, List<SimpleLocation>> saved_reachableFromLoc = new Drawers<>();
-    public static final Drawers<SimpleLocation, List<SimpleLocation>> saved_reachableFromLoc_watermob = new Drawers<>();
     public static final List<Pair<SimpleLocation,SimpleLocation>> dangerZone = new ArrayList<>();
     public static List<Material> zombie_defense_materials = Arrays.asList(Material.CAMPFIRE, Material.SOUL_CAMPFIRE,Material.HOPPER,
         Material.WITHER_ROSE, Material.CACTUS, Material.LAVA, Material.RAIL, Material.STONE_SLAB,

@@ -6,3 +6,8 @@ authors: [ unfish ]
 commands:
   maps:
     permission: za.infoshow
+  debug:
+    permission: za.plugin
+  infect:
+    permission: za.game
+

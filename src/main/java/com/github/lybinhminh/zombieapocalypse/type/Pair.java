@@ -10,8 +10,7 @@ public class Pair <T1, T2> extends Object{
     @Override
     public boolean equals(Object b){
         if(!(b instanceof Pair))return false;
-        Pair another = (Pair)b;
-        return first.equals(another.first) && second.equals(another.second);
+        return first.equals(((Pair)b).first) && second.equals(((Pair)b).second);
     }
     public T1 getKey(){
         return first;
