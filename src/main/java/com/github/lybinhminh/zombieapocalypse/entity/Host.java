@@ -480,6 +480,7 @@ public class Host {
                                         break;
                                     } else {
                                         patience--;
+                                        continue;
                                     }
                                 }
 

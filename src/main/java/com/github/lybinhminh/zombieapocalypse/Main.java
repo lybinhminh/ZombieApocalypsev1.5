@@ -848,7 +848,10 @@ public final class Main extends JavaPlugin implements Listener {
             {
                 while(_def.size() > 0){
                     Chunk c = _def.get(0);
-                    c.unload();
+                    if(c != null) {
+                        c.unload();
+                        c.setForceLoaded(false);
+                    }
                     _def.remove(0);
                 }
             }
@@ -1097,7 +1100,10 @@ public final class Main extends JavaPlugin implements Listener {
             if(__def.size() > 0){
                 while( __def.size() > 0){
                     Chunk c = __def.get(0);
-                    c.load(true);
+                    if(c != null) {
+                        c.load(true);
+                        c.setForceLoaded(true);
+                    }
                     __def.remove(0);
                 }
             }
