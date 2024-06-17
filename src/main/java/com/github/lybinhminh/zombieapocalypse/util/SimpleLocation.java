@@ -65,7 +65,7 @@ public class SimpleLocation extends Object {
                     Chunk c =
                             w.getChunkAt((int)cLoc.x,(int) cLoc.z);
                     Main.__def.add(c);
-                    recentlyLoadedChunks.put(cLoc ,1.225d * Bukkit.getTPS()[0]);
+                    recentlyLoadedChunks.put(cLoc ,0.551d * Bukkit.getTPS()[0]);
                 }catch(Exception e){
                     e.printStackTrace();
                 }

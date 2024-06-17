@@ -11,14 +11,14 @@ public class Drawers <T1,T2>{
     List<T1> list = new ArrayList<>();
     List<T2> map = new ArrayList<>();
     public void put(T1 k , T2 v){
-        int a;
+
         if(list.contains(k)){
-            a = list.indexOf(k);
+            int a = list.indexOf(k);
+            list.remove(a);
             map.remove(a);
             map.add(a, v);
         }
         else{
-            a = list.size();
             list.add(k);
             map.add(v);
         }

@@ -1006,6 +1006,7 @@ public final class Main extends JavaPlugin implements Listener {
         int schedule6 = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this,()->{
             {
                 StringBuilder intermediate = new StringBuilder();
+                intermediate.append("Total number of chunks:").append(SimpleLocation.recentlyLoadedChunks.size()).append("\n");
                 for(Pair<SimpleLocation, Double> c : SimpleLocation.recentlyLoadedChunks.entrySet()){
                     try {
                         intermediate.append(c.first.toString()).append(" -> ").append(c.second).append("\n");
