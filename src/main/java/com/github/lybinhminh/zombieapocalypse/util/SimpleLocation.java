@@ -1,6 +1,7 @@
 package com.github.lybinhminh.zombieapocalypse.util;
 
 import com.github.lybinhminh.zombieapocalypse.Lib;
+import com.github.lybinhminh.zombieapocalypse.Main;
 import com.github.lybinhminh.zombieapocalypse.type.Drawers;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -63,7 +64,7 @@ public class SimpleLocation extends Object {
                     World w = Objects.requireNonNull(Bukkit.getWorld(world));
                     Chunk c =
                             w.getChunkAt((int)cLoc.x,(int) cLoc.z);
-                    c.load(true);
+                    Main.__def.add(c);
                     recentlyLoadedChunks.put(cLoc ,1.225d * Bukkit.getTPS()[0]);
                 }catch(Exception e){
                     e.printStackTrace();

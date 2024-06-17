@@ -77,6 +77,7 @@ public final class Main extends JavaPlugin implements Listener {
     public final static int[] noThreads = {0};
     public static boolean debugMode = false;
     public final List<Chunk> _def = new ArrayList<>();
+    public static final List<Chunk> __def = new ArrayList<>();
     @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
     @Override
     public void onEnable() {
@@ -798,12 +799,13 @@ public final class Main extends JavaPlugin implements Listener {
                 }
             }
             {
-                for(Host h : _abc){
+                for(int i = 0; _abc.size() > 0;){
+                    Host h = _abc.get(0);
                     if(h.getTarget() != null)
                         Host.damage(h.baseEntity, h.getTarget(), h.generic_attack_damage, h.generic_attack_knockback);
+
+                    _abc.remove(0);
                 }
-                if(_abc.size() > 0)
-                _abc.clear();
             }
             {
                 for(Pair<SimpleLocation,Integer> e : _abc_xyz.entrySet()){
@@ -844,10 +846,11 @@ public final class Main extends JavaPlugin implements Listener {
                 }
             }
             {
-                for(Chunk c: _def){
+                while(_def.size() > 0){
+                    Chunk c = _def.get(0);
                     c.unload();
+                    _def.remove(0);
                 }
-                _def.clear();
             }
         }, 0, 20);
 
@@ -1090,6 +1093,16 @@ public final class Main extends JavaPlugin implements Listener {
         }, 0, 20);
         this.getServer().getPluginManager().registerEvents(this,this);
 
+        int schedule7 = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, ()->{
+            if(__def.size() > 0){
+                while( __def.size() > 0){
+                    Chunk c = __def.get(0);
+                    c.load(true);
+                    __def.remove(0);
+                }
+            }
+
+        },0,1);
 
         getLogger().info("A1");
 
@@ -1115,7 +1128,7 @@ public final class Main extends JavaPlugin implements Listener {
                 if (i / 500 > 0 && i % 500 == 0) {
                     pw.flush();
                     pw.close();
-                    f = new File("./plugins/"+this.getName()+"/data" + n++ + ".save");
+                    f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
                     f.createNewFile();
                     pw = new PrintWriter(f);
                 }
@@ -1154,7 +1167,7 @@ public final class Main extends JavaPlugin implements Listener {
                         a = 0;
                         pw.flush();
                         pw.close();
-                        f = new File("./plugins/"+this.getName() + "data" + n++ + ".save");
+                        f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
                         f.createNewFile();
                         pw = new PrintWriter(f);
                     }
@@ -1166,7 +1179,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             }
             {
-                f = new File("./plugins/" + this.getName()+"/data" + n++ + ".save");
+                f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
                 f.createNewFile();
                 pw = new PrintWriter(f);
                 type = "ENTITY_CORE";
@@ -1177,7 +1190,7 @@ public final class Main extends JavaPlugin implements Listener {
                         a = 0;
                         pw.flush();
                         pw.close();
-                        f = new File("./plugins/"+this.getName() + "data" + n++ + ".save");
+                        f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
                         f.createNewFile();
                         pw = new PrintWriter(f);
                     }
@@ -1195,7 +1208,7 @@ public final class Main extends JavaPlugin implements Listener {
 
             }
             {
-                f = new File("./plugins/" + this.getName()+"/data" + n++ + ".save");
+                f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
                 f.createNewFile();
                 pw = new PrintWriter(f);
                 type = "ZOMBIE_BLOCK";
@@ -1205,7 +1218,7 @@ public final class Main extends JavaPlugin implements Listener {
                         a = 0;
                         pw.flush();
                         pw.close();
-                        f = new File("./plugins/"+this.getName() + "data" + n++ + ".save");
+                        f = new File("./plugins/ZombieApocalypse/data" + n++  + ".save");
                         f.createNewFile();
                         pw = new PrintWriter(f);
                     }
