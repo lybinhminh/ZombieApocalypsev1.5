@@ -28,12 +28,13 @@ public class SimpleLocation extends Object {
         this.x = x;
         this.y = y;
         this.z = z;
-        cLoc = this;
+        cLoc = new SimpleLocation(w,(int)Math.round(x/16),(int)Math.round(z/16));
     }
     public SimpleLocation(UUID w, int chunkX, int chunkZ){
         this.world = w;
         this.x = chunkX;
         this.z = chunkZ;
+        this.y = 256;
         cLoc = this;
     }
     public SimpleLocation(Location loc){
@@ -41,7 +42,7 @@ public class SimpleLocation extends Object {
         x = loc.getX();
         y = loc.getY();
         z = loc.getZ();
-        cLoc = this;
+        cLoc = new SimpleLocation(world,(int)Math.round(x/16),(int)Math.round(z/16));
     }
     @Override
     public boolean equals(Object b){

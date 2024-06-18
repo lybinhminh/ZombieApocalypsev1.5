@@ -606,34 +606,36 @@ public final class Main extends JavaPlugin implements Listener {
                     }
                     Block $b = loc.toBlock();
                     if ($b.getType() != Material.PODZOL) {
-                        c.remove(i);
+                        c.remove(i--);
                         continue;
                     }
                     for(int j = 0; j < 8; ++j){
                         int xMod = 1, zMod = 0;
                         switch(j){
                             case 1:
-                                zMod = 1;
+                                xMod = -1;
                                 break;
                             case 2:
-                                xMod = -1;
+                                xMod = 0;
+                                zMod = -1;
                                 break;
                             case 3:
-                                xMod = -1;
-                                zMod = -1;
+                                xMod = 0;
+                                zMod = 1;
                                 break;
                             case 4:
-                                zMod = -1;
+                                zMod = 1;
                                 break;
                             case 5:
-                                xMod = 0;
+                                xMod = -1;
                                 zMod = 1;
                                 break;
                             case 6:
                                 xMod = -1;
+                                zMod = -1;
                                 break;
                             case 7:
-                                xMod = 0;
+                                xMod = 1;
                                 zMod = -1;
                         }
                         for(int y = (int)Math.round( loc.y - 1); y <= loc.y + 1; ++y) {

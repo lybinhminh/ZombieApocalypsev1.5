@@ -18,5 +18,7 @@ public class Pair <T1, T2> extends Object{
     public T2 getValue(){
         return second;
     }
-
+    public String toString(){
+        return String.valueOf(first) + ": " + String.valueOf(second);
+    }
 }
